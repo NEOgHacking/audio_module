@@ -60,6 +60,7 @@ impl<G: BankPins> Driver<G> for I2sAudioDriver {
 
         Ok(())
     }
+
 }
 
 fn build_audio_out<PIO, const SM: usize, Data, Bclk, Lrclk>(
@@ -97,11 +98,11 @@ where
         _program: program,
     };
 
+    let mut output = Output::new(gpio_bank.gpio5, Level::Low);
+
+    output.set_low();
+
     output.start();
 
     AudioOut::new(output)
 }
-
-let mut output = Output::new(gpio_bank.gpio5, Level::Low);
-
-output.set_low();
