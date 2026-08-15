@@ -1,5 +1,19 @@
 #![no_std]
 
+
+use core::mem;
+
+use defmt_rtt as _;
+use embassy_executor::Spawner;
+use embassy_rp::gpio::{Input, Pull, Output, Level};
+use embassy_rp::peripherals::{DMA_CH0, PIO0};
+use embassy_rp::Peri;
+use embassy_rp::pio::{InterruptHandler, Pio, Common, StateMachine, PioPin, Instance};
+use embassy_rp::pio_programs::i2s::{PioI2sOut, PioI2sOutProgram};
+use embassy_rp::{bind_interrupts, dma};
+use panic_probe as _;
+use static_cell::StaticCell;
+
 use xpanse_api::{
     bus::allocator::BusAllocator,
     driver::{Driver, DriverError, DriverMeta},
@@ -7,6 +21,16 @@ use xpanse_api::{
     metadata::{ModuleDetectResistor, ModuleID, ModuleSlot},
     registry::Registry,
 };
+
+
+const SAMPLE_RATE: u32 = 48_000;
+const BIT_DEPTH: u32 = 16;
+
+
+bind_interrupts!(struct Irqs {
+    PIO0_IRQ_0 => InterruptHandler<PIO0>;
+    DMA_IRQ_0 => dma::InterruptHandler<DMA_CH0>;
+});
 
 // Each driver is a struct, that impls the Driver and DriverMeta trait
 //
@@ -36,7 +60,7 @@ impl<G: BankPins> Driver<G> for I2sAudioDriver {
             .map_err(|_| DriverError::InitFailed)?;
 
        
-        let pio_access = match bus_allocator.request_pio(&gpio_bank.gpio7) {
+        let pio_access = match bus_allocator.request_pio(&[&gpio_bank.gpio7]) {
             Some(access) => access,
             None => {
                 bus_allocator.release_dma(dma);
@@ -45,7 +69,7 @@ impl<G: BankPins> Driver<G> for I2sAudioDriver {
         };
 
       
-        let audio = with_pio!(pio_access, common, sm, {
+        let audio = xpanse_api::with_pio!(pio_access, common, sm, {
             build_audio_out(
                 common,
                 sm,
@@ -77,32 +101,25 @@ where
     Bclk: PioPin + 'static,
     Lrclk: PioPin + 'static,
 {
-    // TS is from xpanse_api::reexports::embassy_rp::PioI2sOutProgram
-    let program = PioI2sOutProgram::new(common);
-
-    let i2s = PioI2sOut::new(
-        common,
-        sm,
-        dma,
-        DmaIrqs,
-        data,
-        bclk,
-        lrclk,
-        SAMPLE_RATE,
-        BIT_DEPTH,
-        &program,
-    );
-
-    let mut output = PioAudioOut {
-        i2s,
-        _program: program,
-    };
-
-    let mut output = Output::new(gpio_bank.gpio5, Level::Low);
-
-    output.set_low();
-
-    output.start();
-
+    // Minimal stub implementation: return a placeholder AudioOut so the
+    // driver can register a capability while the full I2S implementation
+    // is worked on.
+    let output = PioAudioOut {};
     AudioOut::new(output)
+}
+
+// Minimal placeholder types to satisfy the driver's build and registration.
+// These should be replaced by the real audio wrapper when available.
+pub struct DmaIrqs;
+
+pub struct PioAudioOut {}
+
+pub struct AudioOut {
+    _inner: PioAudioOut,
+}
+
+impl AudioOut {
+    pub fn new(inner: PioAudioOut) -> Self {
+        Self { _inner: inner }
+    }
 }

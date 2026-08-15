@@ -4,4 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+defmt-rtt = "1.3.0"
+embassy-executor = "0.10.0"
+embassy-rp = "0.10.0"
+panic-probe = "1.0.0"
+static_cell = "2.1.1"
 xpanse-api = "0.2"
