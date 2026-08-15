@@ -1,18 +1,13 @@
 #![no_std]
 
 
-use core::mem;
 
 use defmt_rtt as _;
-use embassy_executor::Spawner;
-use embassy_rp::gpio::{Input, Pull, Output, Level};
 use embassy_rp::peripherals::{DMA_CH0, PIO0};
 use embassy_rp::Peri;
-use embassy_rp::pio::{InterruptHandler, Pio, Common, StateMachine, PioPin, Instance};
-use embassy_rp::pio_programs::i2s::{PioI2sOut, PioI2sOutProgram};
+use embassy_rp::pio::{InterruptHandler, Common, StateMachine, PioPin, Instance};
 use embassy_rp::{bind_interrupts, dma};
 use panic_probe as _;
-use static_cell::StaticCell;
 
 use xpanse_api::{
     bus::allocator::BusAllocator,
@@ -23,8 +18,8 @@ use xpanse_api::{
 };
 
 
-const SAMPLE_RATE: u32 = 48_000;
-const BIT_DEPTH: u32 = 16;
+// const SAMPLE_RATE: u32 = 48_000;
+// const BIT_DEPTH: u32 = 16;
 
 
 bind_interrupts!(struct Irqs {
@@ -88,12 +83,12 @@ impl<G: BankPins> Driver<G> for I2sAudioDriver {
 }
 
 fn build_audio_out<PIO, const SM: usize, Data, Bclk, Lrclk>(
-    common: &mut Common<'static, PIO>,
-    sm: StateMachine<'static, PIO, SM>,
-    dma: Peri<'static, DMA_CH0>,
-    data: Peri<'static, Data>,
-    bclk: Peri<'static, Bclk>,
-    lrclk: Peri<'static, Lrclk>,
+    _common: &mut Common<'static, PIO>,
+    _sm: StateMachine<'static, PIO, SM>,
+    _dma: Peri<'static, DMA_CH0>,
+    _data: Peri<'static, Data>,
+    _bclk: Peri<'static, Bclk>,
+    _lrclk: Peri<'static, Lrclk>,
 ) -> AudioOut
 where
     PIO: Instance + Send + 'static,
