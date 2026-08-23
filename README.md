@@ -25,5 +25,13 @@ Here is the [onshape link](https://cad.onshape.com/documents/23acd3255b900cc5b85
 WIP
 The software was made as described in the first driver tutorial. It was heavily edited to create I2S compatibility for the audio chip, this however is still not in a working state, i am working hard to get it working but it is not that easy to get working for me because i am shit in rust.
 
+# BOM
+
+|Vendor|Price in $|Tax in $   |
+|------|----------|-----------|
+|LCSC  |10.42     |10.47      |
+|JLCPCB|4.00      |6.80       |
+
+
 # Credits
 Huge thanks to @Koeg for the YSWS and all the help with the firmware!!
