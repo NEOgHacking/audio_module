@@ -15,6 +15,7 @@ use xpanse_api::{
     gpio_bank::{BankPins, GpioBank},
     metadata::{ModuleDetectResistor, ModuleID, ModuleSlot},
     registry::Registry,
+    reexports::embassy_rp::pio::{Common, Instance, StateMachine},
 };
 
 
